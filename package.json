@@ -1,0 +1,29 @@
+{
+  "name": "i18next-loader",
+  "version": "0.0.1",
+  "author": {
+    "name": "atroo (info@atroo.de)"
+  },
+  "description": "a resStore loader for webpack and i18next",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/mit-license.php"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atroo/i18next-loader"
+  },
+  "homepage": "https://github.com/atroo/i18next-loader",
+  "maintainers": [
+    {
+      "name": "Robert Krüger",
+      "email": "robert@atroo.de"
+    },
+      {
+      "name": "Martin Foerster",
+      "email": "martin@atroo.de"
+    }
+  ]
+}

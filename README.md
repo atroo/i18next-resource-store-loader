@@ -15,8 +15,12 @@ Assuming the following Filestructure
      translation.json
     -en
      translation.json
+  -js
+   main.js
 ```
-Use the loader in the following way:
+Use the loader in the following way
+
+main.js:
 ``` javascript
 var i18n = require("i18next-client");
 var resBundle = require("i18next-resource-store-loader!../assets/i18n/index.js");

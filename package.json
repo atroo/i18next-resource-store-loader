@@ -19,9 +19,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/atroo/i18next-loader"
+    "url": "https://github.com/atroo/i18next-resource-store-loader"
   },
-  "homepage": "https://github.com/atroo/i18next-loader",
+  "homepage": "https://github.com/atroo/i18next-resource-store-loader",
   "maintainers": [
     {
       "name": "Robert Krüger",

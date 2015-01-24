@@ -32,7 +32,7 @@
       "email": "martin@atroo.de"
     }
   ],
-  devDependencies: {
+  "devDependencies": {
     "gulp": "^3.8.10",
     "gulp-mocha": "^1.1.1",
     "gulp-util": "^3.0.1",

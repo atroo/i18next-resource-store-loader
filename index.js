@@ -33,6 +33,7 @@ module.exports = function (indexContent) {
             resBundle[dirname][basename] = JSON.parse(content);
             this.addDependency(pathstring);
         }
+        this.addContextDependency(path.join(baseDirectory, dirname));
     }
     return "module.exports = " + JSON.stringify(resBundle);
 }

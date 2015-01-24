@@ -2,7 +2,7 @@
   "name": "i18next-resource-store-loader",
   "version": "0.0.1",
   "author": {
-    "name": "atroo (info@atroo.de)"
+    "name": "atroo (info@atroo.de) www.atroo.net"
   },
   "description": "a resStore loader for webpack and i18next",
   "licenses": [
@@ -10,6 +10,12 @@
       "type": "MIT",
       "url": "http://www.opensource.org/licenses/mit-license.php"
     }
+  ],
+  "keywords": [
+    "webpack",
+    "i18next",
+    "static",
+    "resource"
   ],
   "repository": {
     "type": "git",
@@ -25,5 +31,11 @@
       "name": "Martin Foerster",
       "email": "martin@atroo.de"
     }
-  ]
+  ],
+  devDependencies: {
+    "gulp": "^3.8.10",
+    "gulp-mocha": "^1.1.1",
+    "gulp-util": "^3.0.1",
+    "chai": "^1.9.2"
+  }
 }

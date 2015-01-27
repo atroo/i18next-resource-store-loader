@@ -29,5 +29,9 @@ var resBundle = require("i18next-resource-store-loader!../assets/i18n/index.js")
 i18n.init({
     resStore: resBundle
 });
+
+//use the resources as document at i18next.com
+//e.g. translation namespace
+i18n.t("translation:key");
 ```
 And your done. The index.js can be empty, its just needed to point the loader to the locales root directory.

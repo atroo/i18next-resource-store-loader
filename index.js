@@ -6,7 +6,6 @@ var path = require("path");
 var fs = require("fs");
 module.exports = function (indexContent) {
     this.cacheable && this.cacheable();
-
     var baseDirectory = path.dirname(this.resource);
     var subdirs = fs.readdirSync(baseDirectory).filter(function (file) {
         return fs.statSync(path.join(baseDirectory, file)).isDirectory();
@@ -30,7 +29,11 @@ module.exports = function (indexContent) {
             extname = path.extname(pathstring);
             basename = path.basename(pathstring, extname);
             content = fs.readFileSync(pathstring);
-            resBundle[dirname][basename] = JSON.parse(content);
+            try{
+                resBundle[dirname][basename] = JSON.parse(content);
+            }catch (e) {
+                console.error('a i18n resource file could not be loaded', e);
+            }
             this.addDependency(pathstring);
         }
         this.addContextDependency(path.join(baseDirectory, dirname));

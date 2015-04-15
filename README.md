@@ -1,5 +1,7 @@
 # i18next-resource-store-loader
 
+``` npm install hapi-webpack-dev-plugin ```
+
 this loader generates the resStore config needed for i18next to avoid loading language ressource via http requests. It generates this config from a directory.
 
 ## Usage

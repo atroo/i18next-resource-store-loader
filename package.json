@@ -27,15 +27,18 @@
       "name": "Robert Krüger",
       "email": "robert@atroo.de"
     },
-      {
+    {
       "name": "Martin Foerster",
       "email": "martin@atroo.de"
     }
   ],
+  "dependencies": {
+      "loader-utils": "^0.2.11"
+  },
   "devDependencies": {
+    "chai": "^1.9.2",
     "gulp": "^3.8.10",
     "gulp-mocha": "^1.1.1",
-    "gulp-util": "^3.0.1",
-    "chai": "^1.9.2"
+    "gulp-util": "^3.0.1"
   }
 }

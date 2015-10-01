@@ -4,8 +4,22 @@
 */
 var path = require("path");
 var fs = require("fs");
+
+var loaderUtils = require('loader-utils');
+
 module.exports = function (indexContent) {
     this.cacheable && this.cacheable();
+
+    var options = loaderUtils.parseQuery(this.query);
+
+    var include;
+    if (options.include) {
+        include = new RegExp(options.include);
+    }
+    var exclude;
+    if (options.exclude) {
+        exclude = new RegExp(options.exclude);
+    }
 
     var baseDirectory = path.dirname(this.resource);
     var subdirs = fs.readdirSync(baseDirectory).filter(function (file) {
@@ -21,7 +35,9 @@ module.exports = function (indexContent) {
         resBundle[dirname] = {};
         //get sub files
         files = fs.readdirSync(path.join(baseDirectory, dirname)).filter(function (file) {
-            return fs.statSync(path.join(baseDirectory, dirname, file)).isFile();
+            return fs.statSync(path.join(baseDirectory, dirname, file)).isFile()
+                && (!include || include.test(file))
+                && (!(exclude && exclude.test(file)));
         });
         var filename, extname, basename, content, pathstring;
         for (var j = 0, len2 = files.length; j < len2; j++) {

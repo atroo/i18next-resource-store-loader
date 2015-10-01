@@ -1,5 +1,7 @@
 # i18next-resource-store-loader
 
+``` npm install hapi-webpack-dev-plugin ```
+
 this loader generates the resStore config needed for i18next to avoid loading language ressource via http requests. It generates this config from a directory.
 
 ## Usage
@@ -34,4 +36,14 @@ i18n.init({
 //e.g. translation namespace
 i18n.t("translation:key");
 ```
+
+You can filter files in Filestructure using include and exclude parameters
+``` javascript
+var resBundle = require("i18next-resource-store-loader?include=\\.json$!../assets/i18n/index.js");
+// will load files with json extension only
+
+var resBundle = require("i18next-resource-store-loader?exclude=\\.json$!../assets/i18n/index.js");
+// will skip files with json extension
+```
+
 And your done. The index.js can be empty, its just needed to point the loader to the locales root directory.

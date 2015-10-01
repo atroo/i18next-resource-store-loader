@@ -52,4 +52,22 @@ describe("i18next loader basic testing", function () {
         expect(resStore.fr.main.test).to.be.a('string');
         expect(resStore.fr.main.test).to.be.equal('Ceci est un test!');
     });
+
+    it("should process files that satisfy regular expression from include parameter", function () {
+        thisScope.query = '?include=\\.json$';
+        thisScope.addDependency = function(path) {
+            expect(path).to.not.contain('main.nonjson');
+        };
+
+        var res = loader.call(thisScope, "index.js");
+    });
+
+    it("should not process files that satisfy regular expression from exclude parameter", function () {
+        thisScope.query = '?exclude=\\.nonjson$';
+        thisScope.addDependency = function(path) {
+            expect(path).to.not.contain('main.nonjson');
+        };
+
+        var res = loader.call(thisScope, "index.js");
+    });
 });

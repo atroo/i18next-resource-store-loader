@@ -15,7 +15,8 @@
     "webpack",
     "i18next",
     "static",
-    "resource"
+    "resource",
+    "loader"
   ],
   "repository": {
     "type": "git",

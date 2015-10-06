@@ -1,49 +1,57 @@
 # i18next-resource-store-loader
 
-``` npm install hapi-webpack-dev-plugin ```
+`npm install i18next-resource-store-loader`
 
-this loader generates the resStore config needed for i18next to avoid loading language ressource via http requests. It generates this config from a directory.
+This loader generates the `resStore` config needed for **i18next** to avoid loading language resources via HTTP requests. It generates this config given a directory.
 
 ## Usage
 
-Assuming the following Filestructure
-``` javascript
--app
- -src
-  -assets
-   -i18n
-    index.js
-    -de
-     translation.json
-    -en
-     translation.json
-  -js
-   main.js
+In this example we will assume the following file structure:
+
 ```
-Use the loader in the following way
+└── app
+    └── src
+        ├── assets
+        │   ├── i18n
+        │   │   └── index.js
+        │   ├── de
+        │   │   └── translation.json
+        │   └── en
+        │       └── translation.json
+        └── js
+            └── main.js
+```
 
-main.js:
-``` javascript
+Use the loader in the following way:
+
+```javascript
+// File: main.js
 var i18n = require("i18next-client");
-var resBundle = require("i18next-resource-store-loader!../assets/i18n/index.js");
+var resBundle = require(
+  "i18next-resource-store-loader!../assets/i18n/index.js"
+);
 
-//i18n
 i18n.init({
-    resStore: resBundle
+  resStore: resBundle
 });
 
-//use the resources as document at i18next.com
-//e.g. translation namespace
+// Use the resources as documented on i18next.com
+// e.g. 'translation' namespace
 i18n.t("translation:key");
 ```
 
-You can filter files in Filestructure using include and exclude parameters
-``` javascript
-var resBundle = require("i18next-resource-store-loader?include=\\.json$!../assets/i18n/index.js");
-// will load files with json extension only
+You can filter files in your file structure using include and exclude parameters:
 
-var resBundle = require("i18next-resource-store-loader?exclude=\\.json$!../assets/i18n/index.js");
-// will skip files with json extension
+```javascript
+// will only load files with json extension
+var resBundle = require("i18next-resource-store-loader" +
+                        "?include=\\.json$!../assets/i18n/index.js");
 ```
 
-And your done. The index.js can be empty, its just needed to point the loader to the locales root directory.
+```javascript
+// will skip files with json extension
+var resBundle = require("i18next-resource-store-loader" +
+                        "?exclude=\\.json$!../assets/i18n/index.js");
+```
+
+And you're done! The `index.js` can be empty, it's just needed to point the loader to the root directory of the locales.

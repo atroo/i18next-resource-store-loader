@@ -2,7 +2,7 @@
 
 `npm install i18next-resource-store-loader`
 
-This loader generates the `resStore` config needed for **i18next** to avoid loading language resources via HTTP requests. It generates this config given a directory.
+This loader generates the `resStore` config needed for **i18next** to avoid loading language resources via extra HTTP requests. It generates this config given a directory.
 
 ## Usage
 

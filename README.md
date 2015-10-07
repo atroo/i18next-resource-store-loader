@@ -12,12 +12,12 @@ In this example we will assume the following file structure:
 └── app
     └── src
         ├── assets
-        │   ├── i18n
-        │   │   └── index.js
-        │   ├── de
-        │   │   └── translation.json
-        │   └── en
-        │       └── translation.json
+        │   └── i18n
+        │       ├── index.js
+        │       ├── de
+        │       │   └── translation.json
+        │       └── en
+        │           └── translation.json
         └── js
             └── main.js
 ```

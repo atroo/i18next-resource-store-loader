@@ -39,6 +39,23 @@ i18n.init({
 i18n.t("key");
 ```
 
+For older versions of i18n < 2.X, use the old property names while setting up i18n
+ ```javascript
+ // File: main.js
+ var i18n = require("i18next-client");
+  var resBundle = require(
+    "i18next-resource-store-loader!../assets/i18n/index.js"
+  );
+  		  
+  i18n.init({
+   resStore: resBundle
+  });
+  		  
+ // Use the resources as documented on i18next.com	
+ // e.g. 'translation' namespace
+ i18n.t("translation:key");		
+ ```
+
 You can filter files in your file structure using include and exclude parameters:
 
 ```javascript

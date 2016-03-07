@@ -26,18 +26,17 @@ Use the loader in the following way:
 
 ```javascript
 // File: main.js
-var i18n = require("i18next-client");
+var i18n = require("i18next");
 var resBundle = require(
   "i18next-resource-store-loader!../assets/i18n/index.js"
 );
 
 i18n.init({
-  resStore: resBundle
+  resources: resBundle
 });
 
 // Use the resources as documented on i18next.com
-// e.g. 'translation' namespace
-i18n.t("translation:key");
+i18n.t("key");
 ```
 
 You can filter files in your file structure using include and exclude parameters:

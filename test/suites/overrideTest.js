@@ -34,13 +34,21 @@ describe("i18next loader override testing", function () {
 		expect(resStore.en).to.be.an('object');
 		expect(resStore.en.main.test).to.be.equal('This is an overridden test!');
 	});
-	
+
 	it("should not fail if the proided override dir does not exist", function () {
 		thisScope.query = '?overrideDir=overrideNotExisting&baseDir=base';
 		var res = loader.call(thisScope, "index.js");
 		var resStore = eval(res);
 		expect(resStore.en).to.be.an('object');
 		expect(resStore.en.main.test).to.be.equal('This is a test!');
+	});
+
+	it("if there is not corresponding override folder just keep the base", function () {
+		thisScope.query = '?overrideDir=overrideNotExisting&baseDir=base';
+		var res = loader.call(thisScope, "index.js");
+		var resStore = eval(res);
+		expect(resStore.en).to.be.an('object');
+		expect(resStore.en.lonesome.test).to.be.equal('i am lonley');
 	});
 
 	it("it should parcially override subobjects", function () {

@@ -1,0 +1,11 @@
+{
+	"test": "This is a test!",
+	"sub": {
+		"slug": "i am a sub",
+		"test": "i stay untouched",
+		"subsub": {
+			"slugslug": "i am a sub sub",
+			"test": "i stay untouched"
+		}
+	}
+}

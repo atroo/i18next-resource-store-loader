@@ -56,6 +56,11 @@ For older versions of i18n < 2.X, use the old property names while setting up i1
  i18n.t("translation:key");		
  ```
 
+And you're done! The `index.js` can be empty, it's just needed to point the loader to the root directory of the locales.
+
+## Advanced Usage
+
+### Filter
 You can filter files in your file structure using include and exclude parameters:
 
 ```javascript
@@ -70,4 +75,33 @@ var resBundle = require("i18next-resource-store-loader" +
                         "?exclude=\\.json$!../assets/i18n/index.js");
 ```
 
-And you're done! The `index.js` can be empty, it's just needed to point the loader to the root directory of the locales.
+### Override
+In cases of customized applications it may be handy to have an easy way to replace particular parts of the res store bundle with customized values. The loader supports that by two query parameters.
+
+```javascript
+// will replace everyhting from base with what is existent in override
+var resBundle = require("i18next-resource-store-loader" +
+                        "?overrideDir=override&baseDir=base!../assets/i18n/index.js");
+```
+This configures the loader to work on a file structure like the following:
+
+```
+└── app
+    └── src
+        ├── assets
+        │   └── i18n
+        │       ├── index.js
+		  │       ├── base
+        │       │   ├── de
+        │       │   │   └── translation.json
+        │       │   └── en
+        │       │       └── translation.json
+		  │       └── override
+		  │           └── en
+        │               └── translation.json
+		  │
+        └── js
+            └── main.js
+```
+
+Everthing from base/en/translation.js will be overridden with stuff noted in override/en/translation.js - partial overrides are possible.

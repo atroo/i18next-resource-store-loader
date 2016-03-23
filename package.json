@@ -1,6 +1,6 @@
 {
   "name": "i18next-resource-store-loader",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "author": {
     "name": "atroo (info@atroo.de) www.atroo.net"
   },
@@ -34,7 +34,8 @@
     }
   ],
   "dependencies": {
-      "loader-utils": "^0.2.11"
+    "loader-utils": "^0.2.11",
+    "lodash": "^4.6.1"
   },
   "devDependencies": {
     "chai": "^1.9.2",

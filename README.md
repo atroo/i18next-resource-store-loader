@@ -91,15 +91,15 @@ This configures the loader to work on a file structure like the following:
         ├── assets
         │   └── i18n
         │       ├── index.js
-		  │       ├── base
+        │       ├── base
         │       │   ├── de
         │       │   │   └── translation.json
         │       │   └── en
         │       │       └── translation.json
-		  │       └── override
-		  │           └── en
+        │       └── override		
+        │           └── en
         │               └── translation.json
-		  │
+        │
         └── js
             └── main.js
 ```

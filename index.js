@@ -66,11 +66,13 @@ module.exports = function (indexContent) {
 		//get sub files
 		if (!inOverrideMode) {
 			files = fs.readdirSync(path.join(baseDirectory, dirname)).filter(function (file) {
-				return fs.statSync(path.join(baseDirectory, dirname, file)).isFile() && (!include || include.test(file)) && (!(exclude && exclude.test(file)));
+				var filePath = path.join(dirname, file);
+				return fs.statSync(path.join(baseDirectory, dirname, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
 			});
 		} else {
 			basefiles = fs.readdirSync(path.join(overrideBaseDirectory, '/', dirname)).filter(function (file) {
-				return fs.statSync(path.join(overrideBaseDirectory, '/', dirname, file)).isFile() && (!include || include.test(file)) && (!(exclude && exclude.test(file)));
+				var filePath = path.join(dirname, file);		
+				return fs.statSync(path.join(overrideBaseDirectory, '/', dirname, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
 			});
 		}
 

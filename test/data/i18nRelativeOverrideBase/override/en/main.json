@@ -1,0 +1,9 @@
+{
+	"test": "This is an relativley overridden test!",
+	"sub": {
+		"slug": "i am an relativley overridden sub",
+		"subsub": {
+			"slugslug": "i am an relativley overridden sub sub"
+		}
+	}
+}

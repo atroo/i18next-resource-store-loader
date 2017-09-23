@@ -11,7 +11,8 @@ var loaderUtils = require('loader-utils');
 module.exports = function (indexContent) {
 	this.cacheable && this.cacheable();
 
-	var options = loaderUtils.parseQuery(this.query);
+	//var options = loaderUtils.parseQuery(this.query);
+  const options = loaderUtils.getOptions(this) || {};
 
 	var include;
 	if (options.include) {

@@ -1,107 +1,94 @@
 # i18next-resource-store-loader
 
-`npm install i18next-resource-store-loader`
+`yarn add i18next-resource-store-loader`
 
-This loader generates the `resStore` config needed for **i18next** to avoid loading language resources via extra HTTP requests. It generates this config given a directory.
+This webpack loader generates the `resources` structure necessary for **i18next**.  The structure is webpacked wthith the
+ client bundle, thus avoiding loading any language resources via extra HTTP requests. 
+ 
+Given a locales directory, by default, the loader will find and parse any `json|yaml|yml` file and attribute the 
+contents to the containing lang folder e.g. `en`.  There is no need to add lang such as `en` or `de` inside your 
+`json` or `yaml` files.
+ 
+See the `test/data` directory for structure and example data.
 
 ## Usage
 
-In this example we will assume the following file structure:
+### Sample app structure
 
 ```
 └── app
     └── src
-        ├── assets
-        │   └── i18n
-        │       ├── index.js
-        │       ├── de
-        │       │   └── translation.json
-        │       └── en
-        │           └── translation.json
-        └── js
-            └── main.js
+    │  └── app.js
+    ├── locales
+    │  ├── index.js
+    │  ├── de
+    │  │   ├── foo.json
+    │  │   └── bar.yaml
+    │  └── en
+    │      ├── foo.json
+    │      └── bar.yaml
 ```
 
-Use the loader in the following way:
+### Sample i18next config/use
 
 ```javascript
-// File: main.js
-var i18n = require("i18next");
-var resBundle = require(
-  "i18next-resource-store-loader!../assets/i18n/index.js"
-);
+// File: app.js
+import i18n from 'i18next'
+import resources from 'i18next-resource-store-loader!../locales/index.js'
 
 i18n.init({
-  resources: resBundle
+  resources
 });
 
 // Use the resources as documented on i18next.com
-i18n.t("key");
+i18n.t('key')
 ```
-
-For older versions of i18n < 2.X, use the old property names while setting up i18n
- ```javascript
- // File: main.js
- var i18n = require("i18next-client");
-  var resBundle = require(
-    "i18next-resource-store-loader!../assets/i18n/index.js"
-  );
-  		  
-  i18n.init({
-   resStore: resBundle
-  });
-  		  
- // Use the resources as documented on i18next.com	
- // e.g. 'translation' namespace
- i18n.t("translation:key");		
- ```
 
 And you're done! The `index.js` can be empty, it's just needed to point the loader to the root directory of the locales.
 
 ## Advanced Usage
 
-### Filter
-You can filter files in your file structure using include and exclude parameters:
 
+### Filtering files
+You can filter files in your file structure by specifying any glob supported by [`glob-all`](https://github.com/jpillora/node-glob-all).
+
+By default, any `json|yaml|yml` will be loaded.
+
+#### Only json
 ```javascript
-// will only load files with json extension
-var resBundle = require("i18next-resource-store-loader" +
-                        "?include=\\.json$!../assets/i18n/index.js");
+import resources from "i18next-resource-store-loader?{include: ['**/*.json']}!../locales/index.js"
 ```
 
+#### Json but exclude one file
 ```javascript
-// will skip files with json extension
-var resBundle = require("i18next-resource-store-loader" +
-                        "?exclude=\\.json$!../assets/i18n/index.js");
+import resources from "i18next-resource-store-loader?{include: ['**/*.json', '!**/excludeThis.json']}!../locales/index.js"
 ```
 
-### Override
-In cases of customized applications it may be handy to have an easy way to replace particular parts of the res store bundle with customized values. The loader supports that by two query parameters.
+### Inheritance/Override
+Applications that reuse libraries, or need white label/branding capability can utilize one to many sets of locales that 
+the app will override.  Read the query string as `app` overrides `[../node_modules/lib1, ../node_modules/lib2]`.  
 
 ```javascript
-// will replace everyhting from base with what is existent in override
-var resBundle = require("i18next-resource-store-loader" +
-                        "?overrideDir=override&baseDir=base!../assets/i18n/index.js");
+import resources from "i18next-resource-store-loader?{overrides: ['../node_modules/lib1/locales']}!../locales/index.js"
 ```
 This configures the loader to work on a file structure like the following:
 
 ```
 └── app
-    └── src
-        ├── assets
-        │   └── i18n
-        │       ├── index.js
-        │       ├── base
-        │       │   ├── de
-        │       │   │   └── translation.json
-        │       │   └── en
-        │       │       └── translation.json
-        │       └── override		
-        │           └── en
-        │               └── translation.json
-        │
-        └── js
-            └── main.js
+    ├── src
+    │  └── app.js
+    ├── locales
+    │  ├── index.js
+    │  └── en
+    │      ├── foo.json
+    │      └── bar.yaml
+    └── node_modules
+        └── lib1
+            └── locales
+               ├── index.js
+               └── en
+                   ├── foo.json
+                   └── bar.yaml
 ```
 
-Everthing from base/en/translation.js will be overridden with stuff noted in override/en/translation.js - partial overrides are possible.
+Everthing from `app/locales` will override anything specified in one to many libraries.

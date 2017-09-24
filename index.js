@@ -25,32 +25,39 @@ module.exports = function (indexContent) {
     options.include = [ "**/*.json", "**/*.yml", "**/*.yaml" ]
   }
 
-  let baseDirectory = path.dirname(this.resource) // this is the absolute path to the index.js in the top level locales dir
+  const appLocalesDir = path.dirname(this.resource) // this is the absolute path to the index.js in the top level locales dir
+  let appResBundle = {}
 
-  // all subdirectories match language codes
-  let resBundle = {}
-  const langs = enumerateLangs(baseDirectory)
-  for (let i = 0; i < langs.length; i++) {
-    const lang = langs[ i ]
-    resBundle[ lang ] = {}
+  // needs to be ordered in least specialized to most e.g. base locale -> app locale
+  const moduleLocalesDirs = [ appLocalesDir ]
+  moduleLocalesDirs.forEach((localesDir) => {
+    // all subdirectories match language codes
+    const resBundle = {}
+    const langs = enumerateLangs(localesDir)
+    for (let i = 0; i < langs.length; i++) {
+      const lang = langs[ i ]
+      resBundle[ lang ] = {}
 
-    const fullLangPath = path.join(baseDirectory, lang)
-    const filesToAdd = findAll(options.include, fullLangPath)
-    for (let j = 0; j < filesToAdd.length; j++) {
-      const fullPath = filesToAdd[ j ]
-      const fileContent = fs.readFileSync(fullPath)
-      const extname = path.extname(fullPath)
-      let parsedContent
-      if (extname === '.yaml' || extname === '.yml') {
-        parsedContent = yaml.safeLoad(fileContent)
-      } else {
-        parsedContent = JSON.parse(fileContent)
+      const fullLangPath = path.join(localesDir, lang)
+      const filesToAdd = findAll(options.include, fullLangPath)
+      for (let j = 0; j < filesToAdd.length; j++) {
+        const fullPath = filesToAdd[ j ]
+        const fileContent = fs.readFileSync(fullPath)
+        const extname = path.extname(fullPath)
+        let parsedContent
+        if (extname === '.yaml' || extname === '.yml') {
+          parsedContent = yaml.safeLoad(fileContent)
+        } else {
+          parsedContent = JSON.parse(fileContent)
+        }
+        resBundle[ lang ] = parsedContent
+        this.addDependency(fullPath)
       }
-      resBundle[ lang ] = parsedContent
-      this.addDependency(fullPath)
+
+      this.addContextDependency(fullLangPath)
     }
 
-    this.addContextDependency(fullLangPath)
-  }
-  return "module.exports = " + JSON.stringify(resBundle)
+    appResBundle = merge(appResBundle, resBundle)
+  })
+  return "module.exports = " + JSON.stringify(appResBundle)
 }

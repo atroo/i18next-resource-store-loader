@@ -1,3 +1,5 @@
 {
-    "test": "this is nonjson"
+    "main": {
+        "test": "this is nonjson"
+    }
 }

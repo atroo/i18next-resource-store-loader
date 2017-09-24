@@ -1,3 +1,5 @@
 {
-    "test": "Das ist ein Test!"
+    "main": {
+        "test": "Das ist ein Test!"
+    }
 }

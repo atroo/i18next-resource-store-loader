@@ -1,10 +1,6 @@
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Robert Krüger
-*/
 const path = require("path");
 const fs = require("fs");
-const _ = require("lodash");
+const merge = require("lodash/merge");
 const globAll = require('glob-all');
 const loaderUtils = require('loader-utils');
 
@@ -21,102 +17,37 @@ function findAll (globs, cwd) {
 }
 
 module.exports = function (indexContent) {
-	this.cacheable && this.cacheable();
+  this.cacheable && this.cacheable();
   const options = loaderUtils.getOptions(this) || {};
 
-	if (!options.include) {
-		options.include = ["**/*.json", "**/*.yml", "**/*.yaml"]
-	}
+  if (!options.include) {
+    options.include = [ "**/*.json", "**/*.yml", "**/*.yaml" ]
+  }
 
-	let baseDirectory = path.dirname(this.resource); // this is the absolute path to the index.js in the top level locales dir
-	//let overrideDirectory, overrideBaseDirectory, inOverrideMode = false;
-	//if (options.overrideDir) {
-	//	if (!options.baseDir) {
-	//		throw ("overrideDir can not be used without configuring a base dir");
-	//	}
-	//	overrideDirectory = path.join(baseDirectory, options.overrideDir);
-	//	overrideBaseDirectory = path.join(baseDirectory, options.baseDir);
-	//	inOverrideMode = true;
-	//}
-  //
-	//let subdirs, subdirsbase, subdirsoverride;
-	//if (!inOverrideMode) {
-	//	subdirs = enumerateLangDirs(baseDirectory);
-	//} else {
-	//	subdirsbase = enumerateLangDirs(overrideBaseDirectory);
-	//	try {
-	//		const overriderDir = fs.readdirSync(overrideDirectory);
-	//		subdirsoverride = overriderDir.filter(function (file) {
-	//			return fs.statSync(path.join(overrideDirectory, file)).isDirectory();
-	//		});
-	//	} catch (e) {
-	//		//if the override dir does not exist we go back to normal mode but on the base path
-	//		inOverrideMode = false;
-	//		baseDirectory = overrideBaseDirectory;
-	//		subdirs = subdirsbase;
-	//	}
-	//}
+  let baseDirectory = path.dirname(this.resource); // this is the absolute path to the index.js in the top level locales dir
 
-	//alls sub directories match to languages
-	let resBundle = {}, lang, files, basefiles, overridefiles;
-	//const langDirs = inOverrideMode ? subdirsbase : subdirs;
-	const langDirs = enumerateLangDirs(baseDirectory)
-	for (let i = 0, len = langDirs.length; i < len; i++) {
-		//all files within the sub directory map to namespaces
-		lang = langDirs[i];
-		resBundle[lang] = {};
-		//get sub files
-		//if (!inOverrideMode) {
-		//	files = fs.readdirSync(path.join(baseDirectory, lang)).filter(function (file) {
-		//		const filePath = path.join(lang, file);
-		//		return fs.statSync(path.join(baseDirectory, lang, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
-		//	});
-		//} else {
-		//	basefiles = fs.readdirSync(path.join(overrideBaseDirectory, '/', lang)).filter(function (file) {
-		//		const filePath = path.join(lang, file);
-		//		return fs.statSync(path.join(overrideBaseDirectory, '/', lang, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
-		//	});
-		//}
+  //alls sub directories match to languages
+  let resBundle = {}, lang, files, basefiles, overridefiles;
+  //const langDirs = inOverrideMode ? subdirsbase : subdirs;
+  const langDirs = enumerateLangDirs(baseDirectory)
+  for (let i = 0, len = langDirs.length; i < len; i++) {
+    //all files within the sub directory map to namespaces
+    lang = langDirs[ i ];
+    resBundle[ lang ] = {};
 
-		//let filename, extname, basename, content, overrideContent, pathstring, overridePathstring, fileData, overrideData, overrideFileExists;
-		//const filesToAdd = inOverrideMode ? basefiles : files;
-    //const baseDefiningDirectory = inOverrideMode ? overrideBaseDirectory : baseDirectory;
-    const filesToAdd = findAll(options.include, path.join(baseDirectory, lang));
-		//const baseDefiningDirectory = baseDirectory;
-		for (let j = 0, len2 = filesToAdd.length; j < len2; j++) {
-			const fullPath = filesToAdd[j];
-			//const pathstring = path.join(baseDefiningDirectory, lang, filename);
-      //const fullPath = path.join(baseDirectory, lang, filename);
-			const extname = path.extname(fullPath);
-			const basename = path.basename(fullPath, extname);
-			const content = fs.readFileSync(fullPath);
-			const fileData = JSON.parse(content);
-			//if (inOverrideMode) {
-			//	overrideFileExists = true;
-			//	//here we apply the data from the override dir if existent
-			//	overridePathstring = path.join(overrideDirectory, '/', lang, filename);
-			//	try {
-			//		fs.statSync(overridePathstring).isFile();
-			//	} catch (e) {
-			//		overrideFileExists = false;
-			//	}
-			//	if (overrideFileExists) {
-			//		overrideContent = fs.readFileSync(overridePathstring);
-			//		overrideData = JSON.parse(overrideContent);
-			//		fileData = _.merge(fileData, overrideData);
-			//		this.addDependency(overridePathstring);
-			//	}
-			//}
-			resBundle[lang][basename] = fileData;
-			this.addDependency(fullPath);
-		}
+    const fullLangPath = path.join(baseDirectory, lang)
+    const filesToAdd = findAll(options.include, fullLangPath);
+    for (let j = 0, len2 = filesToAdd.length; j < len2; j++) {
+      const fullPath = filesToAdd[ j ];
+      const extname = path.extname(fullPath);
+      const basename = path.basename(fullPath, extname);
+      const content = fs.readFileSync(fullPath);
+      const fileData = JSON.parse(content);
+      resBundle[ lang ] = fileData;
+      this.addDependency(fullPath);
+    }
 
-		//if (!inOverrideMode) {
-			this.addContextDependency(path.join(baseDirectory, lang));
-		//} else {
-		//	this.addContextDependency(path.join(overrideBaseDirectory, lang));
-		//	this.addContextDependency(path.join(overrideDirectory, lang));
-		//}
-	}
-	return "module.exports = " + JSON.stringify(resBundle);
+    this.addContextDependency(fullLangPath);
+  }
+  return "module.exports = " + JSON.stringify(resBundle);
 }

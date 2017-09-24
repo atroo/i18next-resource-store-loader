@@ -6,7 +6,7 @@ var expect = chai.expect;
 
 var loader = require('../../index');
 
-describe("i18next loader basic testing", function () {
+describe("basic", function () {
     // <SETUP> ///////////////////////////////////////
     beforeEach(function (done) {
         //mock webpack loader this scope
@@ -53,8 +53,9 @@ describe("i18next loader basic testing", function () {
         expect(resStore.fr.main.test).to.be.equal('Ceci est un test!');
     });
 
-    it("should process files that satisfy regular expression from include parameter", function () {
+    it("should process include", function () {
         thisScope.query = '?include=\\.json$';
+        //thisScope.query = '?{include: ["**/*.json"]}';
         thisScope.addDependency = function(path) {
             expect(path).to.not.contain('main.nonjson');
         };
@@ -62,8 +63,9 @@ describe("i18next loader basic testing", function () {
         var res = loader.call(thisScope, "index.js");
     });
 
-    it("should not process files that satisfy regular expression from exclude parameter", function () {
+    it("should not process files that are excluded", function () {
         thisScope.query = '?exclude=\\.nonjson$';
+        //thisScope.query = '?{include: ["**/*.json", "!**/*.nonjson"]}';
         thisScope.addDependency = function(path) {
             expect(path).to.not.contain('main.nonjson');
         };

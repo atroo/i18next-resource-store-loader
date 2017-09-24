@@ -43,6 +43,7 @@
     }
   ],
   "dependencies": {
+    "glob-all": "^3.1.0",
     "loader-utils": "^1.1.0",
     "lodash": "^4.6.1"
   },

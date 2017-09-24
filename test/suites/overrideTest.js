@@ -6,7 +6,7 @@ var expect = chai.expect;
 
 var loader = require('../../index');
 
-describe("i18next loader override testing", function () {
+describe("override", function () {
 	// <SETUP> ///////////////////////////////////////
 	beforeEach(function (done) {
 		//mock webpack loader this scope

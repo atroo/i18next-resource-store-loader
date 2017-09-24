@@ -6,7 +6,6 @@ const path = require("path");
 const fs = require("fs");
 const _ = require("lodash");
 const globAll = require('glob-all');
-
 const loaderUtils = require('loader-utils');
 
 function enumerateLangDirs (dir) {
@@ -25,13 +24,8 @@ module.exports = function (indexContent) {
 	this.cacheable && this.cacheable();
   const options = loaderUtils.getOptions(this) || {};
 
-	let include;
-	if (options.include) {
-		include = new RegExp(options.include);
-	}
-	let exclude;
-	if (options.exclude) {
-		exclude = new RegExp(options.exclude);
+	if (!options.include) {
+		options.include = ["**/*.json", "**/*.yml", "**/*.yaml"]
 	}
 
 	let baseDirectory = path.dirname(this.resource); // this is the absolute path to the index.js in the top level locales dir
@@ -47,7 +41,7 @@ module.exports = function (indexContent) {
   //
 	//let subdirs, subdirsbase, subdirsoverride;
 	//if (!inOverrideMode) {
-		subdirs = enumerateLangDirs(baseDirectory);
+	//	subdirs = enumerateLangDirs(baseDirectory);
 	//} else {
 	//	subdirsbase = enumerateLangDirs(overrideBaseDirectory);
 	//	try {
@@ -73,10 +67,10 @@ module.exports = function (indexContent) {
 		resBundle[lang] = {};
 		//get sub files
 		//if (!inOverrideMode) {
-			files = fs.readdirSync(path.join(baseDirectory, lang)).filter(function (file) {
-				const filePath = path.join(lang, file);
-				return fs.statSync(path.join(baseDirectory, lang, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
-			});
+		//	files = fs.readdirSync(path.join(baseDirectory, lang)).filter(function (file) {
+		//		const filePath = path.join(lang, file);
+		//		return fs.statSync(path.join(baseDirectory, lang, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
+		//	});
 		//} else {
 		//	basefiles = fs.readdirSync(path.join(overrideBaseDirectory, '/', lang)).filter(function (file) {
 		//		const filePath = path.join(lang, file);
@@ -84,18 +78,19 @@ module.exports = function (indexContent) {
 		//	});
 		//}
 
-		let filename, extname, basename, content, overrideContent, pathstring, overridePathstring, fileData, overrideData, overrideFileExists;
+		//let filename, extname, basename, content, overrideContent, pathstring, overridePathstring, fileData, overrideData, overrideFileExists;
 		//const filesToAdd = inOverrideMode ? basefiles : files;
     //const baseDefiningDirectory = inOverrideMode ? overrideBaseDirectory : baseDirectory;
-    const filesToAdd = files;
-		const baseDefiningDirectory = baseDirectory;
+    const filesToAdd = findAll(options.include, path.join(baseDirectory, lang));
+		//const baseDefiningDirectory = baseDirectory;
 		for (let j = 0, len2 = filesToAdd.length; j < len2; j++) {
-			filename = filesToAdd[j];
-			pathstring = path.join(baseDefiningDirectory, lang, filename);
-			extname = path.extname(pathstring);
-			basename = path.basename(pathstring, extname);
-			content = fs.readFileSync(pathstring);
-			fileData = JSON.parse(content);
+			const fullPath = filesToAdd[j];
+			//const pathstring = path.join(baseDefiningDirectory, lang, filename);
+      //const fullPath = path.join(baseDirectory, lang, filename);
+			const extname = path.extname(fullPath);
+			const basename = path.basename(fullPath, extname);
+			const content = fs.readFileSync(fullPath);
+			const fileData = JSON.parse(content);
 			//if (inOverrideMode) {
 			//	overrideFileExists = true;
 			//	//here we apply the data from the override dir if existent
@@ -113,7 +108,7 @@ module.exports = function (indexContent) {
 			//	}
 			//}
 			resBundle[lang][basename] = fileData;
-			this.addDependency(pathstring);
+			this.addDependency(fullPath);
 		}
 
 		//if (!inOverrideMode) {

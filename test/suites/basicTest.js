@@ -54,8 +54,8 @@ describe("basic", function () {
     });
 
     it("should process include", function () {
-        thisScope.query = '?include=\\.json$';
-        //thisScope.query = '?{include: ["**/*.json"]}';
+        //thisScope.query = '?include=\\.json$';
+        thisScope.query = '?{include: ["**/*.json"]}';
         thisScope.addDependency = function(path) {
             expect(path).to.not.contain('main.nonjson');
         };
@@ -64,10 +64,10 @@ describe("basic", function () {
     });
 
     it("should not process files that are excluded", function () {
-        thisScope.query = '?exclude=\\.nonjson$';
-        //thisScope.query = '?{include: ["**/*.json", "!**/*.nonjson"]}';
+        //thisScope.query = '?exclude=\\.nonjson$';
+        thisScope.query = '?{include: ["**/*.json", "!**/exclude.json"]}';
         thisScope.addDependency = function(path) {
-            expect(path).to.not.contain('main.nonjson');
+            expect(path).to.not.contain('exclude.json');
         };
 
         var res = loader.call(thisScope, "index.js");

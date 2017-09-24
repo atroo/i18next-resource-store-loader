@@ -5,6 +5,15 @@
     "name": "atroo (info@atroo.de) www.atroo.net"
   },
   "description": "a resStore loader for webpack and i18next",
+  "main": "index.js",
+  "scripts": {
+    "xbuild": "NODE_ENV=production buildBabel ./src --ignore *.spec.js --out-dir ./build",
+    "xprebuild": "rimraf build",
+    "xrelease": "yarn run build && cd build && npm publish",
+    "test": "yarn test:unit",
+    "test:unit": "mocha",
+    "test:watch": "mocha -w"
+  },
   "licenses": [
     {
       "type": "MIT",
@@ -34,13 +43,13 @@
     }
   ],
   "dependencies": {
-    "loader-utils": "^0.2.11",
+    "glob-all": "^3.1.0",
+    "js-yaml": "^3.10.0",
+    "loader-utils": "^1.1.0",
     "lodash": "^4.6.1"
   },
   "devDependencies": {
-    "chai": "^1.9.2",
-    "gulp": "^3.8.10",
-    "gulp-mocha": "^1.1.1",
-    "gulp-util": "^3.0.1"
+    "chai": "^4.1.2",
+    "mocha": "^3.5.3"
   }
 }

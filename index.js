@@ -1,117 +1,65 @@
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Robert Krüger
-*/
-var path = require("path");
-var fs = require("fs");
-var _ = require("lodash");
+const path = require('path')
+const fs = require('fs')
+const merge = require('lodash/merge')
+const globAll = require('glob-all')
+const loaderUtils = require('loader-utils')
+const yaml = require('js-yaml')
 
-var loaderUtils = require('loader-utils');
+function enumerateLangs (dir) {
+  return fs.readdirSync(dir).filter(function (file) {
+    return fs.statSync(path.join(dir, file)).isDirectory()
+  })
+}
 
-module.exports = function (indexContent) {
-	this.cacheable && this.cacheable();
+//https://github.com/jpillora/node-glob-all#usage
+function findAll (globs, cwd) {
+  const globArray = (Array.isArray(globs) ? globs : [ globs ])
+  return globAll.sync(globArray, { cwd, realpath: true })
+}
 
-	var options = loaderUtils.parseQuery(this.query);
+module.exports = function () {
+  this.cacheable && this.cacheable()
+  const options = loaderUtils.getOptions(this) || {}
 
-	var include;
-	if (options.include) {
-		include = new RegExp(options.include);
-	}
-	var exclude;
-	if (options.exclude) {
-		exclude = new RegExp(options.exclude);
-	}
+  if (!options.include) {
+    options.include = [ '**/*.json', '**/*.yml', '**/*.yaml' ]
+  }
 
-	var baseDirectory = path.dirname(this.resource);
-	var overrideDirectory, overrideBaseDirectory, inOverrideMode = false;
-	if (options.overrideDir) {
-		if (!options.baseDir) {
-			throw ("overrideDir can not be used without configuring a base dir");
-		}
-		overrideDirectory = path.join(baseDirectory, options.overrideDir);
-		overrideBaseDirectory = path.join(baseDirectory, options.baseDir);
-		inOverrideMode = true;
-	}
+  if(!options.overrides) options.overrides = []
+  const appLocalesDir = path.dirname(this.resource) // this is the absolute path to the index.js in the top level locales dir
+  let appResBundle = {}
 
-	var subdirs, subdirsbase, subdirsoverride;
-	if (!inOverrideMode) {
-		subdirs = fs.readdirSync(baseDirectory).filter(function (file) {
-			return fs.statSync(path.join(baseDirectory, file)).isDirectory();
-		});
-	} else {
-		subdirsbase = fs.readdirSync(overrideBaseDirectory).filter(function (file) {
-			return fs.statSync(path.join(overrideBaseDirectory, file)).isDirectory();
-		});
-		try {
-			var overriderDir = fs.readdirSync(overrideDirectory);
-			subdirsoverride = overriderDir.filter(function (file) {
-				return fs.statSync(path.join(overrideDirectory, file)).isDirectory();
-			});
-		} catch (e) {
-			//if the override dir does not exist we go back to normal mode but on the base path
-			inOverrideMode = false;
-			baseDirectory = overrideBaseDirectory;
-			subdirs = subdirsbase;
-		}
-	}
+  // needs to be ordered in least specialized to most e.g. lib locale -> app locale
+  const moduleLocalesDirs = options.overrides.map(override => path.join(appLocalesDir, override))
+  moduleLocalesDirs.push(appLocalesDir)
+  moduleLocalesDirs.forEach((localesDir) => {
+    // all subdirectories match language codes
+    const langs = enumerateLangs(localesDir)
+    for (let i = 0; i < langs.length; i++) {
+      const lang = langs[ i ]
+      const resBundle = {}
+      resBundle[ lang ] = {}
 
-	//alls sub directories match to languages
-	var resBundle = {},
-		dirname, files, basefiles, overridefiles;
-	var languageDefiningDirectories = inOverrideMode ? subdirsbase : subdirs;
-	for (var i = 0, len = languageDefiningDirectories.length; i < len; i++) {
-		//all files within the sub directory map to namespaces
-		dirname = languageDefiningDirectories[i];
-		resBundle[dirname] = {};
-		//get sub files
-		if (!inOverrideMode) {
-			files = fs.readdirSync(path.join(baseDirectory, dirname)).filter(function (file) {
-				var filePath = path.join(dirname, file);
-				return fs.statSync(path.join(baseDirectory, dirname, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
-			});
-		} else {
-			basefiles = fs.readdirSync(path.join(overrideBaseDirectory, '/', dirname)).filter(function (file) {
-				var filePath = path.join(dirname, file);		
-				return fs.statSync(path.join(overrideBaseDirectory, '/', dirname, file)).isFile() && (!include || include.test(filePath)) && (!(exclude && exclude.test(filePath)));
-			});
-		}
+      const fullLangPath = path.join(localesDir, lang)
+      this.addContextDependency(fullLangPath)
 
-		var filename, extname, basename, content, overrideContent, pathstring, overridePathstring, fileData, overrideData, overrideFileExists;
-		var filesToAdd = inOverrideMode ? basefiles : files;
-		var baseDefiningDirectory = inOverrideMode ? overrideBaseDirectory : baseDirectory;
-		for (var j = 0, len2 = filesToAdd.length; j < len2; j++) {
-			filename = filesToAdd[j];
-			pathstring = path.join(baseDefiningDirectory, dirname, filename);
-			extname = path.extname(pathstring);
-			basename = path.basename(pathstring, extname);
-			content = fs.readFileSync(pathstring);
-			fileData = JSON.parse(content);
-			if (inOverrideMode) {
-				overrideFileExists = true;
-				//here we apply the data from the override dir if existent
-				overridePathstring = path.join(overrideDirectory, '/', dirname, filename);
-				try {
-					fs.statSync(overridePathstring).isFile();
-				} catch (e) {
-					overrideFileExists = false;
-				}
-				if (overrideFileExists) {
-					overrideContent = fs.readFileSync(overridePathstring);
-					overrideData = JSON.parse(overrideContent);
-					fileData = _.merge(fileData, overrideData);
-					this.addDependency(overridePathstring);
-				}
-			}
-			resBundle[dirname][basename] = fileData;
-			this.addDependency(pathstring);
-		}
+      const langFiles = findAll(options.include, fullLangPath)
+      for (let j = 0; j < langFiles.length; j++) {
+        const fullPath = langFiles[ j ]
+        this.addDependency(fullPath)
 
-		if (!inOverrideMode) {
-			this.addContextDependency(path.join(baseDirectory, dirname));
-		} else {
-			this.addContextDependency(path.join(overrideBaseDirectory, dirname));
-			this.addContextDependency(path.join(overrideDirectory, dirname));
-		}
-	}
-	return "module.exports = " + JSON.stringify(resBundle);
+        const fileContent = fs.readFileSync(fullPath)
+        const extname = path.extname(fullPath)
+        let parsedContent
+        if (extname === '.yaml' || extname === '.yml') {
+          parsedContent = yaml.safeLoad(fileContent)
+        } else {
+          parsedContent = JSON.parse(fileContent)
+        }
+        resBundle[ lang ] = parsedContent
+        appResBundle = merge(appResBundle, resBundle)
+      }
+    }
+  })
+  return 'module.exports = ' + JSON.stringify(appResBundle)
 }

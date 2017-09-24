@@ -25,11 +25,14 @@ module.exports = function (indexContent) {
     options.include = [ "**/*.json", "**/*.yml", "**/*.yaml" ]
   }
 
+  if(!options.overrides) options.overrides = []
   const appLocalesDir = path.dirname(this.resource) // this is the absolute path to the index.js in the top level locales dir
   let appResBundle = {}
 
+  const moduleLocalesDirs = options.overrides.map(override => path.join(appLocalesDir, override))
+  moduleLocalesDirs.push(appLocalesDir)
   // needs to be ordered in least specialized to most e.g. base locale -> app locale
-  const moduleLocalesDirs = [ appLocalesDir ]
+  //const moduleLocalesDirs = [ appLocalesDir ]
   moduleLocalesDirs.forEach((localesDir) => {
     // all subdirectories match language codes
     const resBundle = {}

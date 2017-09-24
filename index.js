@@ -5,7 +5,7 @@ const globAll = require('glob-all')
 const loaderUtils = require('loader-utils')
 const yaml = require("js-yaml")
 
-function enumerateLangDirs (dir) {
+function enumerateLangs (dir) {
   return fs.readdirSync(dir).filter(function (file) {
     return fs.statSync(path.join(dir, file)).isDirectory()
   })
@@ -29,25 +29,24 @@ module.exports = function (indexContent) {
 
   // all subdirectories match language codes
   let resBundle = {}
-  const langDirs = enumerateLangDirs(baseDirectory)
-  for (let i = 0; i < langDirs.length; i++) {
-    //all files within the sub directory map to namespaces
-    const lang = langDirs[ i ]
+  const langs = enumerateLangs(baseDirectory)
+  for (let i = 0; i < langs.length; i++) {
+    const lang = langs[ i ]
     resBundle[ lang ] = {}
 
     const fullLangPath = path.join(baseDirectory, lang)
     const filesToAdd = findAll(options.include, fullLangPath)
     for (let j = 0; j < filesToAdd.length; j++) {
       const fullPath = filesToAdd[ j ]
-      const content = fs.readFileSync(fullPath)
+      const fileContent = fs.readFileSync(fullPath)
       const extname = path.extname(fullPath)
-      let fileData
+      let parsedContent
       if (extname === '.yaml' || extname === '.yml') {
-        fileData = yaml.safeLoad(content)
+        parsedContent = yaml.safeLoad(fileContent)
       } else {
-        fileData = JSON.parse(content)
+        parsedContent = JSON.parse(fileContent)
       }
-      resBundle[ lang ] = fileData
+      resBundle[ lang ] = parsedContent
       this.addDependency(fullPath)
     }
 

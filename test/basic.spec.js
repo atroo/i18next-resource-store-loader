@@ -13,7 +13,7 @@ describe('basic', function () {
           addDependency: emptFn,
           addContextDependency: emptFn,
           cacheable: emptFn,
-          resource: path.join(__dirname, `./data/basic-${type}/index.js`)
+          resource: path.join(__dirname, `./data/basic-app-${type}/locales/index.js`)
         }
         done()
       })

@@ -1,5 +1,5 @@
 {
-    "main": {
-        "foo": "this is just here to test file exclusion"
-    }
+  "main": {
+    "foo": "this is just here to test file exclusion"
+  }
 }

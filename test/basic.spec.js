@@ -1,7 +1,8 @@
 const path = require('path')
 const chai = require('chai')
 const expect = chai.expect
-const loader = require('../../index')
+const assert = chai.assert
+const loader = require('../index')
 
 describe("basic", function () {
   [ 'yaml', 'json' ].forEach((type) => {
@@ -13,7 +14,7 @@ describe("basic", function () {
           addDependency: emptFn,
           addContextDependency: emptFn,
           cacheable: emptFn,
-          resource: path.join(__dirname, `../data/basic-${type}/index.js`)
+          resource: path.join(__dirname, `./data/basic-${type}/index.js`)
         }
         done()
       })
@@ -51,7 +52,8 @@ describe("basic", function () {
           expect(path).to.not.contain('exclude.json')
         }
 
-        const res = loader.call(thisScope, "index.js")
+        const resStore = loader.call(thisScope, "index.js")
+        //assert.strictEqual(resStore.de.main.foo, undefined)
       })
     })
   })

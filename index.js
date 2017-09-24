@@ -1,9 +1,9 @@
-const path = require("path")
-const fs = require("fs")
-const merge = require("lodash/merge")
+const path = require('path')
+const fs = require('fs')
+const merge = require('lodash/merge')
 const globAll = require('glob-all')
 const loaderUtils = require('loader-utils')
-const yaml = require("js-yaml")
+const yaml = require('js-yaml')
 
 function enumerateLangs (dir) {
   return fs.readdirSync(dir).filter(function (file) {
@@ -17,34 +17,37 @@ function findAll (globs, cwd) {
   return globAll.sync(globArray, { cwd, realpath: true })
 }
 
-module.exports = function (indexContent) {
+module.exports = function () {
   this.cacheable && this.cacheable()
   const options = loaderUtils.getOptions(this) || {}
 
   if (!options.include) {
-    options.include = [ "**/*.json", "**/*.yml", "**/*.yaml" ]
+    options.include = [ '**/*.json', '**/*.yml', '**/*.yaml' ]
   }
 
   if(!options.overrides) options.overrides = []
   const appLocalesDir = path.dirname(this.resource) // this is the absolute path to the index.js in the top level locales dir
   let appResBundle = {}
 
+  // needs to be ordered in least specialized to most e.g. lib locale -> app locale
   const moduleLocalesDirs = options.overrides.map(override => path.join(appLocalesDir, override))
   moduleLocalesDirs.push(appLocalesDir)
-  // needs to be ordered in least specialized to most e.g. base locale -> app locale
-  //const moduleLocalesDirs = [ appLocalesDir ]
   moduleLocalesDirs.forEach((localesDir) => {
     // all subdirectories match language codes
-    const resBundle = {}
     const langs = enumerateLangs(localesDir)
     for (let i = 0; i < langs.length; i++) {
       const lang = langs[ i ]
+      const resBundle = {}
       resBundle[ lang ] = {}
 
       const fullLangPath = path.join(localesDir, lang)
-      const filesToAdd = findAll(options.include, fullLangPath)
-      for (let j = 0; j < filesToAdd.length; j++) {
-        const fullPath = filesToAdd[ j ]
+      this.addContextDependency(fullLangPath)
+
+      const langFiles = findAll(options.include, fullLangPath)
+      for (let j = 0; j < langFiles.length; j++) {
+        const fullPath = langFiles[ j ]
+        this.addDependency(fullPath)
+
         const fileContent = fs.readFileSync(fullPath)
         const extname = path.extname(fullPath)
         let parsedContent
@@ -54,13 +57,9 @@ module.exports = function (indexContent) {
           parsedContent = JSON.parse(fileContent)
         }
         resBundle[ lang ] = parsedContent
-        this.addDependency(fullPath)
+        appResBundle = merge(appResBundle, resBundle)
       }
-
-      this.addContextDependency(fullLangPath)
     }
-
-    appResBundle = merge(appResBundle, resBundle)
   })
-  return "module.exports = " + JSON.stringify(appResBundle)
+  return 'module.exports = ' + JSON.stringify(appResBundle)
 }

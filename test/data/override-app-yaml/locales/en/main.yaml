@@ -1,0 +1,6 @@
+main:
+  test: app test en
+  sub:
+    slug: app sub.slug en
+    subsub:
+      slugslug: app sub.subsub.slugsub en

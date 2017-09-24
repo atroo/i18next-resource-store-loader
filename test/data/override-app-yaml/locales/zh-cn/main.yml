@@ -1,0 +1,6 @@
+main:
+  test: app test zh-cn
+  sub:
+    slug: app sub.slug zh-cn
+    subsub:
+      slugslug: app sub.subsub.slugsub zh-cn

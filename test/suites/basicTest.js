@@ -1,44 +1,36 @@
-var fs = require('fs');
-var path = require('path');
-
-var chai = require('chai');
-var expect = chai.expect;
-
-var loader = require('../../index');
+const fs = require('fs');
+const path = require('path');
+const chai = require('chai');
+const expect = chai.expect;
+const loader = require('../../index');
 
 describe("basic", function () {
-    // <SETUP> ///////////////////////////////////////
-    beforeEach(function (done) {
+  [ 'yaml', 'json' ].forEach((type) => {
+    context(type, () => {
+      beforeEach(function (done) {
         //mock webpack loader this scope
-        var emptFn = function () {};
+        const emptFn = function () {};
         thisScope = {
-            addDependency: emptFn,
-            addContextDependency: emptFn,
-            cacheable: emptFn,
-            resource: path.join(__dirname, "../data/i18n/index.js")
+          addDependency: emptFn,
+          addContextDependency: emptFn,
+          cacheable: emptFn,
+          resource: path.join(__dirname, `../data/basic-${type}/index.js`)
         }
         done();
-    });
+      });
 
-    afterEach(function (done) {
-        done();
-    });
-    // </SETUP> ///////////////////////////////////////
-
-
-    // <TESTS> ///////////////////////////////////////
-    it("should generate a resStore structure", function () {
-        var res = loader.call(thisScope, "index.js");
-        var resStore = eval(res);
+      it("should generate a resStore structure", function () {
+        const res = loader.call(thisScope, "index.js");
+        const resStore = eval(res);
         expect(resStore.dev).to.be.an('object');
         expect(resStore.de).to.be.an('object');
         expect(resStore.en).to.be.an('object');
         expect(resStore.fr).to.be.an('object');
-    });
+      });
 
-    it("should have the correct sub structures", function () {
-        var res = loader.call(thisScope, "index.js");
-        var resStore = eval(res);
+      it("should have the correct sub structures", function () {
+        const res = loader.call(thisScope, "index.js");
+        const resStore = eval(res);
 
         expect(resStore.dev.main.test).to.be.a('string');
         expect(resStore.dev.main.test).to.be.equal('Dev dev dev!');
@@ -51,25 +43,26 @@ describe("basic", function () {
 
         expect(resStore.fr.main.test).to.be.a('string');
         expect(resStore.fr.main.test).to.be.equal('Ceci est un test!');
-    });
+      });
 
-    it("should process include", function () {
+      it("should process include", function () {
         //thisScope.query = '?include=\\.json$';
         thisScope.query = '?{include: ["**/*.json"]}';
-        thisScope.addDependency = function(path) {
-            expect(path).to.not.contain('main.nonjson');
+        thisScope.addDependency = function (path) {
+          expect(path).to.not.contain('main.nonjson');
         };
 
-        var res = loader.call(thisScope, "index.js");
-    });
+        const res = loader.call(thisScope, "index.js");
+      });
 
-    it("should not process files that are excluded", function () {
-        //thisScope.query = '?exclude=\\.nonjson$';
-        thisScope.query = '?{include: ["**/*.json", "!**/exclude.json"]}';
-        thisScope.addDependency = function(path) {
-            expect(path).to.not.contain('exclude.json');
+      it("should not process files that are excluded", function () {
+        thisScope.query = `?{include: ["**/*.${type}", "!**/exclude.${type}"]}`;
+        thisScope.addDependency = function (path) {
+          expect(path).to.not.contain('exclude.json');
         };
 
-        var res = loader.call(thisScope, "index.js");
-    });
-});
+        const res = loader.call(thisScope, "index.js");
+      });
+    })
+  });
+})

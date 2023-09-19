@@ -34,7 +34,6 @@
     }
   ],
   "dependencies": {
-    "loader-utils": "^0.2.11",
     "lodash": "^4.6.1"
   },
   "devDependencies": {

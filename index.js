@@ -6,30 +6,28 @@ var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
 
-var loaderUtils = require('loader-utils');
-
 module.exports = function (indexContent) {
 	this.cacheable && this.cacheable();
 
-	var options = loaderUtils.parseQuery(this.query);
+	var options = new URLSearchParams(this.query);
 
 	var include;
-	if (options.include) {
-		include = new RegExp(options.include);
+	if (options.has('include')) {
+		include = new RegExp(options.get('include'));
 	}
 	var exclude;
-	if (options.exclude) {
-		exclude = new RegExp(options.exclude);
+	if (options.has('exclude')) {
+		exclude = new RegExp(options.get('exclude'));
 	}
 
 	var baseDirectory = path.dirname(this.resource);
 	var overrideDirectory, overrideBaseDirectory, inOverrideMode = false;
-	if (options.overrideDir) {
-		if (!options.baseDir) {
+	if (options.has('overrideDir')) {
+		if (!options.has('baseDir')) {
 			throw ("overrideDir can not be used without configuring a base dir");
 		}
-		overrideDirectory = path.join(baseDirectory, options.overrideDir);
-		overrideBaseDirectory = path.join(baseDirectory, options.baseDir);
+		overrideDirectory = path.join(baseDirectory, options.get('overrideDir'));
+		overrideBaseDirectory = path.join(baseDirectory, options.get('baseDir'));
 		inOverrideMode = true;
 	}
 

@@ -6,8 +6,6 @@ var path = require("path");
 var fs = require("fs");
 var _ = require("lodash");
 
-var loaderUtils = require('loader-utils');
-
 module.exports = function (indexContent) {
 	this.cacheable && this.cacheable();
 

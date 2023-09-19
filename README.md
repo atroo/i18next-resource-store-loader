@@ -1,3 +1,34 @@
+**Deprecated Package**
+
+> we don't activley use this package anymore as now overloading has become way more easy by requiring json data directly. By flattening key and exploding seperate files into the "resources structure" you can basically achieve the same if you want you i18next ressource bundled
+
+```
+import germanBaseTrans from './translation-gen/de/de-base.json';
+import englishBaseTrans from './translation-gen/en/en-base.json';
+
+const germanTrans = {
+  ...germanBaseTrans,
+};
+
+const englishTrans = {
+  ...englishBaseTrans,
+};
+
+...
+  i18n
+    .init({
+      resources: {
+        de: {
+          translation: germanTrans,
+        },
+        en: {
+          translation: englishTrans,
+        },
+      },
+      ...
+    })
+```
+
 # i18next-resource-store-loader
 
 `npm install i18next-resource-store-loader`
@@ -27,12 +58,10 @@ Use the loader in the following way:
 ```javascript
 // File: main.js
 var i18n = require("i18next");
-var resBundle = require(
-  "i18next-resource-store-loader!../assets/i18n/index.js"
-);
+var resBundle = require("i18next-resource-store-loader!../assets/i18n/index.js");
 
 i18n.init({
-  resources: resBundle
+  resources: resBundle,
 });
 
 // Use the resources as documented on i18next.com
@@ -40,49 +69,51 @@ i18n.t("key");
 ```
 
 For older versions of i18n < 2.X, use the old property names while setting up i18n
- ```javascript
- // File: main.js
- var i18n = require("i18next-client");
-  var resBundle = require(
-    "i18next-resource-store-loader!../assets/i18n/index.js"
-  );
-  		  
-  i18n.init({
-   resStore: resBundle
-  });
-  		  
- // Use the resources as documented on i18next.com	
- // e.g. 'translation' namespace
- i18n.t("translation:key");		
- ```
+
+```javascript
+// File: main.js
+var i18n = require("i18next-client");
+var resBundle = require("i18next-resource-store-loader!../assets/i18n/index.js");
+
+i18n.init({
+  resStore: resBundle,
+});
+
+// Use the resources as documented on i18next.com
+// e.g. 'translation' namespace
+i18n.t("translation:key");
+```
 
 And you're done! The `index.js` can be empty, it's just needed to point the loader to the root directory of the locales.
 
 ## Advanced Usage
 
 ### Filter
+
 You can filter files in your file structure using include and exclude parameters:
 
 ```javascript
 // will only load files with json extension
 var resBundle = require("i18next-resource-store-loader" +
-                        "?include=\\.json$!../assets/i18n/index.js");
+  "?include=\\.json$!../assets/i18n/index.js");
 ```
 
 ```javascript
 // will skip files with json extension
 var resBundle = require("i18next-resource-store-loader" +
-                        "?exclude=\\.json$!../assets/i18n/index.js");
+  "?exclude=\\.json$!../assets/i18n/index.js");
 ```
 
 ### Override
+
 In cases of customized applications it may be handy to have an easy way to replace particular parts of the res store bundle with customized values. The loader supports that by two query parameters.
 
 ```javascript
 // will replace everyhting from base with what is existent in override
 var resBundle = require("i18next-resource-store-loader" +
-                        "?overrideDir=override&baseDir=base!../assets/i18n/index.js");
+  "?overrideDir=override&baseDir=base!../assets/i18n/index.js");
 ```
+
 This configures the loader to work on a file structure like the following:
 
 ```
@@ -96,7 +127,7 @@ This configures the loader to work on a file structure like the following:
         │       │   │   └── translation.json
         │       │   └── en
         │       │       └── translation.json
-        │       └── override		
+        │       └── override
         │           └── en
         │               └── translation.json
         │
